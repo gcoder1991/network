@@ -16,8 +16,8 @@ public abstract class TcpClient extends ChannelInitializer<SocketChannel> implem
 
     private final static Logger LOG = LoggerFactory.getLogger(TcpClient.class);
 
-    private EventLoopGroup bossGroup;
-    private Bootstrap bootstrap;
+    private final EventLoopGroup bossGroup;
+    private final Bootstrap bootstrap;
 
     private Channel channel;
     private InetSocketAddress remoteAddress;

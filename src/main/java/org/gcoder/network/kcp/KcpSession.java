@@ -29,7 +29,7 @@ public abstract class KcpSession {
 	
 	private long lastPingTime = System.currentTimeMillis();
 	
-	private ConcurrentLinkedQueue<ByteBuf> receviedQueue = new ConcurrentLinkedQueue<>();
+	private ConcurrentLinkedQueue<ByteBuf> recevieQueue = new ConcurrentLinkedQueue<>();
 	
 	public KcpSession(Kcp kcp, KcpLoopGroup group, Executor executor) {
 		this.kcp = kcp;
@@ -42,7 +42,7 @@ public abstract class KcpSession {
 	}
 	
 	public void inputReliable(ByteBuf udpData) {
-		receviedQueue.add(udpData);
+		recevieQueue.add(udpData);
 	}
 	
 	public abstract void recevieProtocol(ByteBuf data);
@@ -66,15 +66,15 @@ public abstract class KcpSession {
 			return;
 		}
 		
-		boolean recevie = false;
+		boolean recevied = false;
 		long currentTimeMillis = System.currentTimeMillis();
 		
 		while(true){
-			ByteBuf poll = receviedQueue.poll();
+			ByteBuf poll = recevieQueue.poll();
 			if (poll == null) {
 				break;
-			} else if(!recevie) {
-				recevie = true;
+			} else if(!recevied) {
+				recevied = true;
 			}
 			try {
 				kcp.input(poll);
@@ -95,7 +95,7 @@ public abstract class KcpSession {
 		}
 		
 		// ttl
-		if (recevie) {
+		if (recevied) {
 			lastPingTime = currentTimeMillis;
 		} else if (currentTimeMillis - lastPingTime > TTL_DEFAULT_IN_MILLIS) {
 			close();
