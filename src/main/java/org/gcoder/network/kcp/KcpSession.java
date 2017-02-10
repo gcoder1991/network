@@ -14,10 +14,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class KcpSession {
 	
-	private final static Logger LOG = LoggerFactory.getLogger(KcpSession.class);
+	private static final Logger LOG = LoggerFactory.getLogger(KcpSession.class);
 	
-	public final static long TTL_DEFAULT_IN_MILLIS = 3 * 60 * 1000;
-	
+	public static final long TTL_DEFAULT_IN_MILLIS = 3 * 60 * 1000;
+
+	private final KcpSessionManager sessionManager;
 	private final KcpSession session;
 	
 	private final Kcp kcp;
@@ -31,16 +32,17 @@ public abstract class KcpSession {
 	
 	private ConcurrentLinkedQueue<ByteBuf> recevieQueue = new ConcurrentLinkedQueue<>();
 	
-	public KcpSession(Kcp kcp, KcpLoopGroup group, Executor executor) {
+	public KcpSession(Kcp kcp, KcpSessionManager sessionManager) {
+		this.sessionManager = sessionManager;
 		this.kcp = kcp;
-		this.group = group;
+		this.group = sessionManager.getKcpLoopGroup();
 		this.loopThread = group.register(this);
 		this.open.compareAndSet(false, true);
-		this.executor = executor;
+		this.executor = sessionManager.getExecutor();
 		this.session = this;
 		LOG.debug("Kcp Session Create : conv={}", getConv());
 	}
-	
+
 	public void inputReliable(ByteBuf udpData) {
 		recevieQueue.add(udpData);
 	}
@@ -55,6 +57,7 @@ public abstract class KcpSession {
 		open.compareAndSet(true, false);
 		group.deregister(this);
 		kcp.release();
+		sessionManager.remove(getConv());
 	}
 	
 	/**
@@ -128,6 +131,10 @@ public abstract class KcpSession {
 
 	public Executor getExecutor() {
 		return executor;
+	}
+
+	public KcpSessionManager getSessionManager() {
+		return sessionManager;
 	}
 	
 }

@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class KcpLoopThread extends Thread implements Comparable<KcpLoopThread> {
 
-    private final static Logger LOG = LoggerFactory.getLogger(KcpLoopThread.class);
+    private static final Logger LOG = LoggerFactory.getLogger(KcpLoopThread.class);
 
     private Map<Integer, KcpSession> sessionGroup = new ConcurrentHashMap<>();
 

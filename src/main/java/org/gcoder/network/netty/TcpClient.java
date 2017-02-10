@@ -14,7 +14,7 @@ import java.net.InetSocketAddress;
 
 public abstract class TcpClient extends ChannelInitializer<SocketChannel> implements NettyClient {
 
-    private final static Logger LOG = LoggerFactory.getLogger(TcpClient.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TcpClient.class);
 
     private final EventLoopGroup bossGroup;
     private final Bootstrap bootstrap;

@@ -6,7 +6,7 @@ import java.util.List;
 
 public class KcpLoopGroup extends ThreadGroup {
 
-    public final static String NAME = "KCP_LOOP_GROUP";
+    public static final String NAME = "KCP_LOOP_GROUP";
 
     private List<KcpLoopThread> threads = new ArrayList<>();
 
