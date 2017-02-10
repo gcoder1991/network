@@ -17,7 +17,7 @@ public class DefaultSession extends KcpSession {
 
     @Override
     public void recevieProtocol(ByteBuf data) {
-        System.out.println(new String(ByteBufUtil.getBytes(data).toString()));
+        System.out.println(new String(ByteBufUtil.getBytes(data)));
     }
 
 }

@@ -1,16 +1,15 @@
 package org.gcoder.network.kcp.base;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
+import io.netty.util.ReferenceCountUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufAllocator;
-import io.netty.util.ReferenceCountUtil;
 
 /**
  * KCP - A Better ARQ Protocol Implementation
@@ -126,7 +125,6 @@ public abstract class Kcp {
      * user/upper level recv: returns size, returns below zero for EAGAIN
      * 将接收队列中的数据传递给上层引用
      *
-     * @param buffer
      * @return
      */
     public Optional<ByteBuf> recv() {

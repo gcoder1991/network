@@ -12,7 +12,7 @@ import org.gcoder.session.DefaultSessionManager;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
- * Created by Administrator on 2017/2/10.
+ * Created by gcoder on 2017/2/10.
  */
 public class KcpServer extends UdpServer {
 
@@ -27,7 +27,7 @@ public class KcpServer extends UdpServer {
 
     class ServerHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 
-        private final DefaultSessionManager sessionManager = new DefaultSessionManager(new KcpLoopGroup(1),new ScheduledThreadPoolExecutor(1));
+        final DefaultSessionManager sessionManager = new DefaultSessionManager(new KcpLoopGroup(1),new ScheduledThreadPoolExecutor(1));
 
         @Override
         protected void channelRead0(ChannelHandlerContext ctx, DatagramPacket msg) throws Exception {
@@ -35,7 +35,12 @@ public class KcpServer extends UdpServer {
             if (session == null){
                 session = sessionManager.create(1, msg.sender(), ctx.channel());
             }
-            session.inputReliable(msg.content());
+            session.inputReliable(msg.content().copy());
+        }
+
+        @Override
+        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+            cause.printStackTrace();
         }
     }
 

@@ -31,8 +31,10 @@ public class DefaultSessionManager implements KcpSessionManager<Integer>,Runnabl
     }
 
     @Override
-    public KcpSession create(Integer conv, InetSocketAddress addr, Channel channel) {
-        return sessionGroup.put(conv, new DefaultSession(new DefaultKcp(conv, addr, channel), this));
+    public synchronized KcpSession create(Integer conv, InetSocketAddress addr, Channel channel) {
+        DefaultSession session = new DefaultSession(new DefaultKcp(conv, addr, channel), this);
+        sessionGroup.put(conv, session);
+        return session;
     }
 
     @Override
