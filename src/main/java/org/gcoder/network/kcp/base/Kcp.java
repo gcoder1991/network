@@ -244,11 +244,11 @@ public abstract class Kcp {
             if (len <= this.mss) {
                 count = 1;
             } else {
-                count = (len + this.mss - 1) / this.mss;
+                count = (int)Math.ceil(len * 1.0f / this.mss);
             }
 
             if (count > 255) {
-                throw new SecurityException("data too int");
+                throw new SecurityException("data too long");
             }
 
             if (count == 0) {
@@ -262,6 +262,7 @@ public abstract class Kcp {
                 seg.writeData(buffer, size);
                 seg.frg = stream ? 0 : (count - i - 1);
                 snd_queue.add(seg);
+                len -= size;
             }
 
         } finally {
