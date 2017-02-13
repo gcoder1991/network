@@ -7,6 +7,8 @@ import org.gcoder.network.kcp.KcpLoopGroup;
 import org.gcoder.network.kcp.KcpSession;
 import org.gcoder.network.netty.UdpClient;
 import org.gcoder.session.DefaultSessionManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.CountDownLatch;
@@ -16,6 +18,8 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
  * Created by gcoder on 2017/2/10.
  */
 public class KcpClient extends UdpClient {
+
+    private static final Logger LOG = LoggerFactory.getLogger(KcpClient.class);
 
     private final InetSocketAddress server;
 
@@ -42,24 +46,26 @@ public class KcpClient extends UdpClient {
 
         @Override
         public void channelActive(ChannelHandlerContext ctx) throws Exception {
+            LOG.info("channel active!");
             sessionManager.create(1, server, ctx.channel());
             semaphore.countDown();
         }
 
         @Override
         protected void channelRead0(ChannelHandlerContext ctx, DatagramPacket msg) throws Exception {
-            sessionManager.get(1).inputReliable(msg.content());
+            sessionManager.get(1).inputReliable(msg.content().copy());
         }
 
         @Override
         public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-            System.out.println(cause);
+            LOG.info("exceptionCaught", cause);
         }
 
         protected void sayHi() throws InterruptedException {
             semaphore.await();
+            System.out.println("session created!");
             KcpSession session = sessionManager.get(1);
-            ByteBuf data = session.getAllocator().buffer().writeBytes("Hi".getBytes());
+            ByteBuf data = session.getAllocator().buffer().writeBytes("Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890,Hi1234567890".getBytes());
             session.outputReliable(data);
         }
 

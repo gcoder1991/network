@@ -81,8 +81,8 @@ public abstract class KcpSession {
 			}
 			try {
 				kcp.input(poll);
-			}catch (Exception e) {
-				e.printStackTrace();
+			} catch (Exception e) {
+				LOG.error("kcp input error", e);
 			} finally {
 				ReferenceCountUtil.release(poll);
 			}

@@ -25,7 +25,7 @@ public class DefaultKcp extends Kcp {
         super(conv, user, channel.alloc());
         this.channel = channel;
         this.setNodelay(true,10,2,false);
-        this.setMtu(1300);
+        this.setMtu(100);
         this.setWndSize(128,128);
     }
 
