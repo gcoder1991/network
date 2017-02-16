@@ -13,10 +13,47 @@ import java.util.Optional;
 
 /**
  * KCP - A Better ARQ Protocol Implementation
- * <p>
- * Features: + Average RTT reduce 30% - 40% vs traditional ARQ like tcp. +
- * Maximum RTT reduce three times vs tcp. + Lightweight, distributed as a single
- * source file.
+ *
+ * Features:
+ *      + Average RTT reduce 30% - 40% vs traditional ARQ like tcp.
+ *      + Maximum RTT reduce three times vs tcp.
+ *      + Lightweight, distributed as a single source file.
+ *
+ * --------------------------------------------------------
+ * snd	    send/sender                     发送/发送者
+ * rcv	    receive/receiver                接收/接收者
+ * nxt	    next                            下一个，这个缩写一般用在 snd.nxt 或者 rcv.nxt
+ *                                              这两个指针上，详情参考上一节的发送窗口和接收窗口
+ * wnd	    window                          窗口（大小）
+ * una	    unacknowledged                  未确认的窗口指针（请参考上一节中的发送窗口）
+ * ack	    acknowledge                     确认，这个表示接收者受到数据后给发送者的应答
+ * psh	    push	                        psh 表示推送数据
+ * mtu	    maximum transmission unit	    最大传输单元，这个表示在一个特定的硬件链路上，
+ *                                              一个 IP 包的最大长度（字节）
+ * mss	    maximum segment size	        mtu - 20 - tcp/kcp header，比如 1500 的 mtu，
+ *                                              则 tcp 的 mss 为 1460（1500 - 20 - 20）
+ * rto	    retransmission timeout	        表示发出数据后等待对方ack的超时
+ * rtt	    round-trip time	                从一个数据发出，到收到对应的 ack 这之间的时间间隔
+ * srtt	    smoothed rtt	                平滑后的 rtt
+ * sn	    serial number	                表示这个数据包的序列号，每个包都有递增的sn
+ * conv	    conversation	                会话号，一个 kcp 连接用的是 conv 标识的
+ * cmd	    command	                        这个表示这个 segment 是干嘛的，ack 表示确认，psh 表示推送数据
+ * ts	    timestamp	                    时间戳，这个其实就是一个普通的时间戳，大多数kcp实现都是用当前毫秒数的
+ *                                              低 32-bit 来表示的。超过 2^32 之后，重新从0计数。因为是无符号数，
+ *                                              所以只考虑差值的话，算法都是对的。
+ * frg	    fragment	                    数据分片，如果 kcp 是 stream 模式，则所有的数据包 frg 都是 0，
+ *                                              否则一个大数据包将依据mss被拆成若干小包，他们的frag依次递增
+ * cwnd	    congestion window	            拥塞窗口，这个概念很关键
+ * ssthresh	slow start threshold	        慢启动阈值，这个也是核心概念之一
+ * seg	    segment	                        数据包在网络层级中不同的地方名字也不同，在链路层比如以太网，
+ *                                              数据叫帧（frame），往上到 IP 层叫包（packet），再往上到
+ *                                              tcp/kcp 这层就叫数据段（segment），UDP 中叫数据报（datagram）
+ * xmit	    transmit	                    通信领域专业缩写，表示传输
+ * tx_	    transport	                    通信领域专业缩写，表示传输
+ * rx_	    receive	                        通信领域专业缩写，表示接收
+ *
+ * 以上来自 QXSoftware 整理
+ * https://github.com/QXSoftware/kcp.git
  */
 public abstract class Kcp {
 
@@ -30,29 +67,27 @@ public abstract class Kcp {
     protected int mss = KcpBasic.KCP_MTU_DEF - KcpBasic.KCP_OVERHEAD; // 最大分段大小
     protected int state = 0;
 
-    protected int snd_una = 0;
+    protected int snd_una = 0; // 未确认的发送窗口指针
     protected int snd_nxt = 0;
     protected int rcv_nxt = 0;
 
-    protected int ts_recent = 0;
-    protected int ts_lastack = 0;
-    protected int ssthresh = KcpBasic.KCP_THRESH_INIT;
+    protected int ssthresh = KcpBasic.KCP_THRESH_INIT; // 慢启动阈值
 
     protected int rx_rttval = 0;
-    protected int rx_srtt = 0;
-    protected int rx_rto = KcpBasic.KCP_RTO_DEF;
+    protected int rx_srtt = 0; // 接收_平滑后的rtt（从一个数据发出到收到ack的时间间隔）
+    protected int rx_rto = KcpBasic.KCP_RTO_DEF; // 接收_发出数据等待ack的超时
     protected int rx_minrto = KcpBasic.KCP_RTO_MIN;
 
     protected int snd_wnd = KcpBasic.KCP_WND_SND;
     protected int rcv_wnd = KcpBasic.KCP_WND_RCV;
     protected int rmt_wnd = KcpBasic.KCP_WND_RCV;
-    protected int cwnd = 0;
+    protected int cwnd = 0; // congestion window 拥塞窗口
     protected int probe = 0;
 
     protected int current = 0;
     protected int interval = KcpBasic.KCP_INTERVAL;
     protected int ts_flush = KcpBasic.KCP_INTERVAL;
-    protected int xmit = 0;
+    protected int xmit = 0; // 传输
 
     protected boolean nodelay = false;
     protected boolean updated = false;

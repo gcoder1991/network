@@ -4,6 +4,11 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.util.ReferenceCountUtil;
 
+/**
+ * 数据段：
+ *      数据包在不同的网络层级中名字有所区别，在链路层，比如以太网，数据叫帧（frame）
+ *      往上到IP层叫包（packet），再往上到tcp/kcp叫做段（segment），udp中叫做数据报（datagram）
+ */
 public class Segment {
 
     protected int conv;
