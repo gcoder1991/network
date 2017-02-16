@@ -59,57 +59,66 @@ public abstract class Kcp {
 
     private final static Logger LOG = LoggerFactory.getLogger(Kcp.class);
 
-    protected final ByteBufAllocator allocator;
+    final ByteBufAllocator allocator;
 
-    protected final int conv; // 会话编号
+    final int conv; // 会话编号
 
-    protected int mtu = KcpBasic.KCP_MTU_DEF; // 最大传输单元
-    protected int mss = KcpBasic.KCP_MTU_DEF - KcpBasic.KCP_OVERHEAD; // 最大分段大小
-    protected int state = 0;
+    int mtu = KcpBasic.KCP_MTU_DEF; // 最大传输单元
+    int mss = KcpBasic.KCP_MTU_DEF - KcpBasic.KCP_OVERHEAD; // 最大分段大小
+    int state = 0;
 
-    protected int snd_una = 0; // 未确认的发送窗口指针
-    protected int snd_nxt = 0;
-    protected int rcv_nxt = 0;
+    // 未确认的发送窗口指针
+    int snd_una = 0;
+    int snd_nxt = 0;
+    int rcv_nxt = 0;
 
-    protected int ssthresh = KcpBasic.KCP_THRESH_INIT; // 慢启动阈值
+    // 慢启动阈值
+    int ssthresh = KcpBasic.KCP_THRESH_INIT;
 
-    protected int rx_rttval = 0;
-    protected int rx_srtt = 0; // 接收_平滑后的rtt（从一个数据发出到收到ack的时间间隔）
-    protected int rx_rto = KcpBasic.KCP_RTO_DEF; // 接收_发出数据等待ack的超时
-    protected int rx_minrto = KcpBasic.KCP_RTO_MIN;
+    int rx_rttval = 0;
+    // 接收_平滑后的rtt（从一个数据发出到收到ack的时间间隔）
+    int rx_srtt = 0;
+    // 接收_发出数据等待ack的超时
+    int rx_rto = KcpBasic.KCP_RTO_DEF;
+    int rx_minrto = KcpBasic.KCP_RTO_MIN;
 
-    protected int snd_wnd = KcpBasic.KCP_WND_SND;
-    protected int rcv_wnd = KcpBasic.KCP_WND_RCV;
-    protected int rmt_wnd = KcpBasic.KCP_WND_RCV;
-    protected int cwnd = 0; // congestion window 拥塞窗口
-    protected int probe = 0;
+    int snd_wnd = KcpBasic.KCP_WND_SND;
+    int rcv_wnd = KcpBasic.KCP_WND_RCV;
+    int rmt_wnd = KcpBasic.KCP_WND_RCV;
+    // congestion window 拥塞窗口
+    int cwnd = 0;
+    int probe = 0;
 
-    protected int current = 0;
-    protected int interval = KcpBasic.KCP_INTERVAL;
-    protected int ts_flush = KcpBasic.KCP_INTERVAL;
-    protected int xmit = 0; // 传输
+    int current = 0;
+    int interval = KcpBasic.KCP_INTERVAL;
+    int ts_flush = KcpBasic.KCP_INTERVAL;
+    // 传输
+    int xmit = 0;
 
-    protected boolean nodelay = false;
-    protected boolean updated = false;
+    boolean nodelay = false;
+    boolean updated = false;
 
-    protected int ts_probe = 0;
-    protected int probe_wait = 0;
+    int ts_probe = 0;
+    int probe_wait = 0;
 
-    protected int dead_link = KcpBasic.KCP_DEADLINK;
-    protected int incr = 0;
+    int dead_link = KcpBasic.KCP_DEADLINK;
+    int incr = 0;
 
-    protected List<Segment> snd_queue = new ArrayList<>();
-    protected List<Segment> rcv_queue = new ArrayList<>();
-    protected List<Segment> snd_buf = new ArrayList<>();
-    protected List<Segment> rcv_buf = new ArrayList<>();
+    List<Segment> snd_queue = new ArrayList<>();
+    List<Segment> rcv_queue = new ArrayList<>();
+    List<Segment> snd_buf = new ArrayList<>();
+    List<Segment> rcv_buf = new ArrayList<>();
 
-    protected List<Integer> ackList = new ArrayList<>();
+    List<Integer> ackList = new ArrayList<>();
 
-    protected ByteBuf buffer; // outputBuffer
-    protected int fastresend = 0;
+    // outputBuffer
+    ByteBuf buffer;
+    int fastresend = 0;
 
-    protected boolean nocwnd = false; // 是否关闭流控
-    protected boolean stream = false; // 流模式
+    // 是否关闭流控
+    boolean nocwnd = false;
+    // 流模式
+    boolean stream = false;
 
     protected InetSocketAddress user;
 
