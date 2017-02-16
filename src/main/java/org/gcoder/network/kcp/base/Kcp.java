@@ -684,9 +684,9 @@ public abstract class Kcp {
     public int check(int current) {
 
         int ts_flush = this.ts_flush;
-        int tm_flush = 0x7fffffff;
+        int tm_flush;
         int tm_packet = 0x7fffffff;
-        int minimal = 0;
+        int minimal;
 
         if (!updated) {
             return current;

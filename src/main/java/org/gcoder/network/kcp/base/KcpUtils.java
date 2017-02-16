@@ -6,15 +6,15 @@ import org.slf4j.LoggerFactory;
 import java.util.Iterator;
 import java.util.List;
 
-public final class KcpUtils {
+final class KcpUtils {
 
     private final static Logger LOG = LoggerFactory.getLogger(KcpUtils.class);
 
-    public final static int bound(int lower, int middle, int upper) {
+    private static int bound(int lower, int middle, int upper) {
         return Math.min(Math.max(lower, middle), upper);
     }
 
-    public final static int timeDiff(int later, int earlier) {
+    static int timeDiff(int later, int earlier) {
         return later - earlier;
     }
 
@@ -24,7 +24,7 @@ public final class KcpUtils {
      * @param kcp
      * @param newSeg
      */
-    public final static void parseData(Kcp kcp, Segment newSeg) {
+    static void parseData(Kcp kcp, Segment newSeg) {
         int sn = newSeg.sn;
         boolean repeat = false;
         if (timeDiff(sn, kcp.rcv_nxt + kcp.rcv_wnd) >= 0 || timeDiff(sn, kcp.rcv_nxt) < 0) {
@@ -78,7 +78,7 @@ public final class KcpUtils {
         LOG.trace("rcv(buf={}, queue={})", kcp.rcv_buf.size(), kcp.rcv_queue.size());
     }
 
-    public final static void parseUna(Kcp kcp, int una) {
+    static void parseUna(Kcp kcp, int una) {
         List<Segment> snd_buf = kcp.snd_buf;
         while (!snd_buf.isEmpty()) {
             Segment peek = snd_buf.get(0);
@@ -95,7 +95,7 @@ public final class KcpUtils {
      *
      * @param kcp
      */
-    public final static void shrinkBuf(Kcp kcp) {
+    static void shrinkBuf(Kcp kcp) {
         if (kcp.snd_buf.size() > 0) {
             kcp.snd_una = kcp.snd_buf.get(0).sn;
         } else {
@@ -109,7 +109,7 @@ public final class KcpUtils {
      * @param kcp
      * @param sn
      */
-    public final static void parseAck(Kcp kcp, int sn) {
+    static void parseAck(Kcp kcp, int sn) {
         if (timeDiff(sn, kcp.snd_una) < 0 || timeDiff(sn, kcp.snd_nxt) >= 0) {
             return;
         }
@@ -135,12 +135,12 @@ public final class KcpUtils {
      * @param sn
      * @param ts
      */
-    public final static void pushAck(Kcp kcp, int sn, int ts) {
+    static void pushAck(Kcp kcp, int sn, int ts) {
         kcp.ackList.add(sn);
         kcp.ackList.add(ts);
     }
 
-    public final static void updateAck(Kcp kcp, int rtt) {
+    static void updateAck(Kcp kcp, int rtt) {
         if (kcp.rx_srtt == 0) {
             kcp.rx_srtt = rtt;
             kcp.rx_rttval = rtt / 2;
@@ -159,7 +159,7 @@ public final class KcpUtils {
         kcp.rx_rto = bound(kcp.rx_minrto, rto, KcpBasic.KCP_RTO_MAX);
     }
 
-    public final static void parseFastAck(Kcp kcp, int sn) {
+    static void parseFastAck(Kcp kcp, int sn) {
         if (timeDiff(sn, kcp.snd_una) < 0 || timeDiff(sn, kcp.snd_nxt) >= 0) {
             return;
         }
@@ -172,7 +172,7 @@ public final class KcpUtils {
         }
     }
 
-    public final static int wndUnused(Kcp kcp) {
+    static int wndUnused(Kcp kcp) {
         if (kcp.rcv_queue.size() < kcp.rcv_wnd) {
             return kcp.rcv_wnd - kcp.rcv_queue.size();
         }
