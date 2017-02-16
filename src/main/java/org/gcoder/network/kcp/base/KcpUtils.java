@@ -155,7 +155,7 @@ final class KcpUtils {
                 kcp.rx_srtt = 1;
             }
         }
-        int rto = kcp.rx_srtt + Math.max(1, 4 * kcp.rx_rttval);
+        int rto = kcp.rx_srtt + Math.max(kcp.interval, 4 * kcp.rx_rttval);
         kcp.rx_rto = bound(kcp.rx_minrto, rto, KcpBasic.KCP_RTO_MAX);
     }
 
