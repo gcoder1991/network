@@ -54,10 +54,10 @@ public abstract class KcpSession {
 	}
 	
 	public void close() {
+		sessionManager.remove(getConv());
 		open.compareAndSet(true, false);
 		group.deregister(this);
 		kcp.release();
-		sessionManager.remove(getConv());
 	}
 	
 	/**

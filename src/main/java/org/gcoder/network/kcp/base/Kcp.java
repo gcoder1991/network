@@ -393,7 +393,14 @@ public abstract class Kcp {
                                 segment.writeData(data, len);
                             }
                             KcpUtils.parseData(this, segment);
+                        } else {
+                            LOG.debug(String.format("old data: sn = %d rcv_nxt = %d rcv_wnd = %d una = %d",
+                                    sn , this.rcv_nxt, this.rcv_wnd, this.snd_una));
+                            return;
                         }
+                    } else {
+                        LOG.debug(String.format("push error: sn = %d rcv_nxt = %d rcv_wnd = %d", sn , this.rcv_nxt, this.rcv_wnd));
+                        return;
                     }
                     break;
                 case KcpBasic.KCP_CMD_WASK:
