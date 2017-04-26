@@ -45,7 +45,7 @@ public class KcpLoopThread extends Thread implements Comparable<KcpLoopThread> {
             });
 
             try {
-                sleep(10);
+                sleep(1);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
