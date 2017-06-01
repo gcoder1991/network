@@ -71,7 +71,7 @@ public abstract class KcpSession {
 		
 		boolean recevied = false;
 		long currentTimeMillis = System.currentTimeMillis();
-		
+
 		while(true){
 			ByteBuf poll = recevieQueue.poll();
 			if (poll == null) {
