@@ -57,7 +57,9 @@ final class KcpUtils {
             newSeg.release();
         }
 
-        LOG.trace("rcv_nxt={}", kcp.rcv_nxt);
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("rcv_nxt={}", kcp.rcv_nxt);
+        }
 
         // move available data from rcv_buf -> rcv_queue
         // 将连续包加入到接收队列
@@ -72,10 +74,12 @@ final class KcpUtils {
             }
         }
 
-        LOG.trace("rcv_next={}", kcp.rcv_nxt);
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("rcv_next={}", kcp.rcv_nxt);
 
-        LOG.trace("snd(buf={}, queue={})", kcp.snd_buf.size(), kcp.snd_queue.size());
-        LOG.trace("rcv(buf={}, queue={})", kcp.rcv_buf.size(), kcp.rcv_queue.size());
+            LOG.trace("snd(buf={}, queue={})", kcp.snd_buf.size(), kcp.snd_queue.size());
+            LOG.trace("rcv(buf={}, queue={})", kcp.rcv_buf.size(), kcp.rcv_queue.size());
+        }
     }
 
     static void parseUna(Kcp kcp, int una) {

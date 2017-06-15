@@ -42,7 +42,9 @@ public abstract class UdpServer extends ChannelInitializer implements NettyServe
     public ChannelFuture bind() throws Exception {
         ChannelFuture future = bootstrap.bind();
         this.channel = future.channel();
-        LOG.debug("Udp Server bind to {}", localAddress);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Udp Server bind to {}", localAddress);
+        }
         return future;
     }
 

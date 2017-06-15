@@ -46,7 +46,9 @@ public abstract class TcpClient extends ChannelInitializer<SocketChannel> implem
     public ChannelFuture connect() throws Exception {
         ChannelFuture channelFuture = bootstrap.connect();
         channel = channelFuture.channel();
-        LOG.debug("TCP Client connect to {}", remoteAddress);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("TCP Client connect to {}", remoteAddress);
+        }
         return channelFuture;
     }
 

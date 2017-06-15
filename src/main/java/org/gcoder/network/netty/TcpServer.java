@@ -57,7 +57,9 @@ public abstract class TcpServer extends ChannelInitializer implements NettyServe
     public ChannelFuture bind() throws Exception {
         ChannelFuture channelFuture = bootstrap.bind();
         this.channel = channelFuture.channel();
-        LOG.debug("TCP Server bind to {}", localAddress);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("TCP Server bind to {}", localAddress);
+        }
         return channelFuture;
     }
 

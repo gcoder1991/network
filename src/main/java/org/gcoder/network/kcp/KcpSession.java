@@ -40,7 +40,9 @@ public abstract class KcpSession {
 		this.open.compareAndSet(false, true);
 		this.executor = sessionManager.getExecutor();
 		this.session = this;
-		LOG.debug("Kcp Session Create : conv={}", getConv());
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("Kcp Session Create : conv={}", getConv());
+		}
 	}
 
 	public void inputReliable(ByteBuf udpData) {
@@ -82,7 +84,9 @@ public abstract class KcpSession {
 			try {
 				kcp.input(poll);
 			} catch (Exception e) {
-				LOG.error("kcp input error", e);
+				if (LOG.isErrorEnabled()) {
+					LOG.error("kcp input error", e);
+				}
 			} finally {
 				ReferenceCountUtil.release(poll);
 			}
@@ -104,13 +108,17 @@ public abstract class KcpSession {
 			lastPingTime = currentTimeMillis;
 		} else if (currentTimeMillis - lastPingTime > TTL_DEFAULT_IN_MILLIS) {
 			close();
-			LOG.info("CLOSE : Kcp Session TTL : conv={}", getConv());
+			if (LOG.isInfoEnabled()) {
+				LOG.info("CLOSE : Kcp Session TTL : conv={}", getConv());
+			}
 			return;
 		}
 		
 		if (kcp.waitSnd() > 128){
 			session.close();
-			LOG.error("CLOSE : Kcp Session So Many Message Wait To Send : conv={}", getConv());
+			if (LOG.isErrorEnabled()) {
+				LOG.error("CLOSE : Kcp Session So Many Message Wait To Send : conv={}", getConv());
+			}
 			return;
 		}
 	}

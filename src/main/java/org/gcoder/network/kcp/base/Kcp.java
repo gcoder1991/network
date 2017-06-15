@@ -188,7 +188,9 @@ public abstract class Kcp {
         // merge fragment
         while (!rcv_queue.isEmpty()) {
             Segment seg = rcv_queue.remove(0);
-            LOG.trace("recv sn={}", seg.sn);
+            if(LOG.isTraceEnabled()) {
+                LOG.trace("recv sn={}", seg.sn);
+            }
             seg.encodeData(data);
             seg.release();
             if (seg.frg == 0) {
@@ -326,7 +328,9 @@ public abstract class Kcp {
         int maxAck = 0;
         boolean flag = false;
 
-        LOG.trace("[RI] {} bytes", data.readableBytes());
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("[RI] {} bytes", data.readableBytes());
+        }
 
         if (data == null || data.readableBytes() < KcpBasic.KCP_OVERHEAD) {
             return;
@@ -373,11 +377,17 @@ public abstract class Kcp {
                     } else if (KcpUtils.timeDiff(sn, maxAck) > 0) {
                         maxAck = sn;
                     }
-                    LOG.trace(String.format("input ack: sn=%d rtt=%d rto=%d", sn, KcpUtils.timeDiff(this.current, ts),
-                            this.rx_rto));
+
+                    if (LOG.isTraceEnabled()) {
+                        LOG.trace(String.format("input ack: sn=%d rtt=%d rto=%d", sn, KcpUtils.timeDiff(this.current, ts),
+                                this.rx_rto));
+                    }
+
                     break;
                 case KcpBasic.KCP_CMD_PUSH:
-                    LOG.trace("input psh : snd={} ts={}", sn, ts);
+                    if (LOG.isTraceEnabled()) {
+                        LOG.trace("input psh : snd={} ts={}", sn, ts);
+                    }
                     if (KcpUtils.timeDiff(sn, this.rcv_nxt + this.rcv_wnd) < 0) {
                         KcpUtils.pushAck(this, sn, ts);
                         if (KcpUtils.timeDiff(sn, this.rcv_nxt) >= 0) {
@@ -394,12 +404,16 @@ public abstract class Kcp {
                             }
                             KcpUtils.parseData(this, segment);
                         } else {
-                            LOG.debug(String.format("old data: sn = %d rcv_nxt = %d rcv_wnd = %d una = %d",
-                                    sn , this.rcv_nxt, this.rcv_wnd, this.snd_una));
+                            if (LOG.isDebugEnabled()) {
+                                LOG.debug(String.format("old data: sn = %d rcv_nxt = %d rcv_wnd = %d una = %d",
+                                        sn , this.rcv_nxt, this.rcv_wnd, this.snd_una));
+                            }
                             return;
                         }
                     } else {
-                        LOG.debug(String.format("push error: sn = %d rcv_nxt = %d rcv_wnd = %d", sn , this.rcv_nxt, this.rcv_wnd));
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug(String.format("push error: sn = %d rcv_nxt = %d rcv_wnd = %d", sn , this.rcv_nxt, this.rcv_wnd));
+                        }
                         return;
                     }
                     break;
@@ -407,11 +421,15 @@ public abstract class Kcp {
                     // ready to send back IKCP_CMD_WINS in ikcp_flush
                     // tell remote my window size
                     this.probe |= KcpBasic.KCP_ASK_TELL;
-                    LOG.trace("input probe");
+                    if (LOG.isTraceEnabled()) {
+                        LOG.trace("input probe");
+                    }
                     break;
                 case KcpBasic.KCP_CMD_WINS:
                     // do nothing
-                    LOG.trace("input wins : %lu", wnd);
+                    if (LOG.isTraceEnabled()) {
+                        LOG.trace("input wins : %lu", wnd);
+                    }
                     break;
                 default:
                     throw new SecurityException("error data : cmd not exist");

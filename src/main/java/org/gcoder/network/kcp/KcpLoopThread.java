@@ -17,13 +17,17 @@ public class KcpLoopThread extends Thread implements Comparable<KcpLoopThread> {
 
     public KcpLoopThread(ThreadGroup group, int index) {
         super(group, group.getName().concat("_Thread-").concat(String.valueOf(index)));
-        LOG.debug("KCP THREAD INIT : {}", this.getName());
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("KCP THREAD INIT : {}", this.getName());
+        }
     }
 
     public KcpLoopThread register(KcpSession session) {
         sessionGroup.put(session.getConv(), session);
         int num = holdNum.incrementAndGet();
-        LOG.debug("{} register kcp session {} : num = {}", new Object[]{this.getName(), session.getConv(), num});
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("{} register kcp session {} : num = {}", new Object[]{this.getName(), session.getConv(), num});
+        }
         return this;
     }
 
@@ -40,7 +44,9 @@ public class KcpLoopThread extends Thread implements Comparable<KcpLoopThread> {
                 try {
                     session.onTick();
                 } catch (Exception e) {
-                    LOG.error(getName(), e);
+                    if (LOG.isErrorEnabled()) {
+                        LOG.error(getName(), e);
+                    }
                 }
             });
 
