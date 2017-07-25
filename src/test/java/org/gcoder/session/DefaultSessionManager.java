@@ -13,7 +13,7 @@ import java.util.concurrent.ScheduledExecutorService;
 /**
  * Created by gcoder on 2017/2/10.
  */
-public class DefaultSessionManager implements KcpSessionManager<Integer>,Runnable {
+public class DefaultSessionManager implements KcpSessionManager<Integer, KcpSession>,Runnable {
 
     private final KcpLoopGroup group;
     private final ScheduledExecutorService scheduled;
