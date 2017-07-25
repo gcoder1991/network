@@ -10,8 +10,9 @@ import java.util.concurrent.Executor;
  */
 public interface KcpSessionManager<K,T> {
 
-    KcpSession create(K key, InetSocketAddress addr, Channel channel, T target);
-
+   // KcpSession create(K key, InetSocketAddress addr, Channel channel, T target);
+    KcpSession create(K key, InetSocketAddress addr, Channel channel);
+    
     KcpSession remove(K key);
 
     KcpSession get(K key);
