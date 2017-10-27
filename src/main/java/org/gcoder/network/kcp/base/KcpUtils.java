@@ -144,6 +144,71 @@ final class KcpUtils {
         kcp.ackList.add(ts);
     }
 
+    /**
+     * rto 计算
+     * Jacobson / Karels 算法
+     * 链接：https://tools.ietf.org/html/rfc6298
+     *
+     * To compute the current RTO, a TCP sender maintains two state
+     * variables, SRTT (smoothed round-trip time) and RTTVAR (round-trip
+     * time variation).  In addition, we assume a clock granularity of G
+     * seconds.
+     * The rules governing the computation of SRTT, RTTVAR, and RTO are as
+     * follows:
+     *
+     * (2.1) Until a round-trip time (RTT) measurement has been made for a
+     * segment sent between the sender and receiver, the sender SHOULD
+     * set RTO <- 1 second, though the "backing off" on repeated
+     * retransmission discussed in (5.5) still applies.
+     *
+     * Note that the previous version of this document used an initial
+     * RTO of 3 seconds [PA00].  A TCP implementation MAY still use
+     * this value (or any other value > 1 second).  This change in the
+     * lower bound on the initial RTO is discussed in further detail
+     * in Appendix A.
+     *
+     * (2.2) When the first RTT measurement R is made, the host MUST set
+     *
+     * SRTT <- R
+     * RTTVAR <- R/2
+     * RTO <- SRTT + max (G, K*RTTVAR)
+     *
+     * where K = 4.
+     *
+     * (2.3) When a subsequent RTT measurement R' is made, a host MUST set
+     *
+     * RTTVAR <- (1 - beta) * RTTVAR + beta * |SRTT - R'|
+     * SRTT <- (1 - alpha) * SRTT + alpha * R'
+     *
+     * The value of SRTT used in the update to RTTVAR is its value
+     * before updating SRTT itself using the second assignment.  That
+     * is, updating RTTVAR and SRTT MUST be computed in the above
+     * order.
+     *
+     * The above SHOULD be computed using alpha=1/8 and beta=1/4 (as
+     * suggested in [JK88]).
+     *
+     * After the computation, a host MUST update
+     * RTO <- SRTT + max (G, K*RTTVAR)
+     *
+     * (2.4) Whenever RTO is computed, if it is less than 1 second, then the
+     * RTO SHOULD be rounded up to 1 second.
+     *
+     * Traditionally, TCP implementations use coarse grain clocks to
+     * measure the RTT and trigger the RTO, which imposes a large
+     * minimum value on the RTO.  Research suggests that a large
+     * minimum RTO is needed to keep TCP conservative and avoid
+     * spurious retransmissions [AP99].  Therefore, this specification
+     * requires a large minimum RTO as a conservative approach, while
+     * at the same time acknowledging that at some future point,
+     * research may show that a smaller minimum RTO is acceptable or
+     * superior.
+     *
+     * (2.5) A maximum value MAY be placed on RTO provided it is at least 60
+     * seconds.
+     * @param kcp
+     * @param rtt
+     */
     static void updateAck(Kcp kcp, int rtt) {
         if (kcp.rx_srtt == 0) {
             kcp.rx_srtt = rtt;
